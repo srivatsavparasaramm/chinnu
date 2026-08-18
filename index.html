@@ -19,10 +19,31 @@
 
 <body>
 
-  <!-- Ambient Sound Toggle -->
-  <button id="music-toggle" class="music-toggle" aria-label="Toggle ambient music" title="Toggle gentle sound">
-    <span class="music-icon">🎵</span>
-  </button>
+  <!-- Romantic Music Player Widget -->
+  <div class="music-player-widget" id="music-player-widget" role="button" aria-label="Toggle romantic music" tabindex="0" title="Click to play / pause romantic music">
+    <button id="music-toggle" class="music-toggle" aria-label="Toggle romantic music">
+      <span class="music-icon" id="music-icon">🎵</span>
+    </button>
+    <div class="music-info" id="music-info">
+      <div class="music-bars active" id="music-bars">
+        <span class="bar bar-1"></span>
+        <span class="bar bar-2"></span>
+        <span class="bar bar-3"></span>
+        <span class="bar bar-4"></span>
+      </div>
+      <div class="music-details">
+        <span class="music-title">Romantic Melody</span>
+        <span class="music-status" id="music-status">Playing ♡</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Romantic Background Audio Element with multiple sources -->
+  <audio id="romantic-audio" loop preload="auto">
+    <source src="https://archive.org/download/100ClassicalMusicMasterpieces/1698%20Pachelbel%20%2C%20Canon%20in%20D.mp3" type="audio/mpeg">
+    <source src="https://archive.org/download/CanonInD_261/CanoninD.mp3" type="audio/mpeg">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>
 
   <!-- Canvas for Floating Particles and Hearts -->
   <canvas id="ambient-canvas"></canvas>
@@ -60,7 +81,7 @@
             <button type="submit" id="btn-secret-submit" class="btn-primary">Continue</button>
           </div>
           <div id="secret-error" class="error-msg" aria-live="polite"></div>
-          <p class="hint-text">Hint: <span>chinnuu</span></p>
+          <p class="hint-text">Hint: <span id="hint-clickable" class="hint-badge" title="Click to autofill">chinnuu</span></p>
         </form>
       </div>
     </section>

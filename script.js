@@ -18,11 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const CORRECT_ANSWER = 'chinnuu';
   
-  // Audio state (Web Audio API Synthesizer)
-  let audioCtx = null;
-  let isPlayingSound = false;
-  let synthNodes = [];
-
   // ==========================================
   // PAGE NAVIGATION LOGIC
   // ==========================================
@@ -48,7 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Event: Click "Click Here" on Home Page
   btnStart.addEventListener('click', () => {
     switchPage(pageHome, pageSecret);
-    initAudioOnUserGesture();
+    if (!isMusicPlaying) {
+      userInteracted = true;
+      playRomanticMusic();
+    }
   });
 
   // Event: Click on Hint badge auto-fills input
@@ -204,11 +202,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 8000);
   }
 
+  // Elements
+  const musicPlayerWidget = document.getElementById('music-player-widget');
+  const musicToggle = document.getElementById('music-toggle');
+  const musicIcon = document.getElementById('music-icon');
+  const musicBars = document.getElementById('music-bars');
+  const musicStatus = document.getElementById('music-status');
+  const romanticAudio = document.getElementById('romantic-audio');
+
   // ==========================================
-  // OPTIONAL AMBIENT AUDIO SYNTHESIZER
+  // ROMANTIC MUSIC & AUTOPLAY SYSTEM
   // ==========================================
 
-  function initAudioOnUserGesture() {
+  let isMusicPlaying = false;
+  let audioCtx = null;
+  let synthInterval = null;
+  let synthGainNode = null;
+  let userInteracted = false;
+
+  // Initialize Web Audio Context on gesture if needed
+  function getAudioContext() {
     if (!audioCtx) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (AudioContext) {
@@ -218,86 +231,217 @@ document.addEventListener('DOMContentLoaded', () => {
     if (audioCtx && audioCtx.state === 'suspended') {
       audioCtx.resume();
     }
+    return audioCtx;
   }
 
-  function playAmbientTone() {
-    if (!audioCtx) initAudioOnUserGesture();
-    if (!audioCtx) return;
+  // Romantic Piano Synthesizer (Zero-latency fallback / ambient layer)
+  function startRomanticSynth() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
 
-    if (isPlayingSound) {
-      stopAmbientTone();
-      return;
+    if (synthGainNode) return; // Already running
+
+    synthGainNode = ctx.createGain();
+    synthGainNode.gain.setValueAtTime(0.01, ctx.currentTime);
+    synthGainNode.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 2);
+
+    const masterFilter = ctx.createBiquadFilter();
+    masterFilter.type = 'lowpass';
+    masterFilter.frequency.setValueAtTime(550, ctx.currentTime);
+
+    synthGainNode.connect(masterFilter);
+    masterFilter.connect(ctx.destination);
+
+    // Emotional romantic arpeggio notes (D, F#, A, B, E, C#)
+    const romanticChords = [
+      [146.83, 220.00, 293.66, 369.99, 440.00], // D Maj
+      [110.00, 164.81, 220.00, 277.18, 329.63], // A Maj
+      [123.47, 185.00, 246.94, 293.66, 369.99], // B Min
+      [98.00,  146.83, 196.00, 246.94, 293.66], // G Maj
+    ];
+
+    let chordIndex = 0;
+    let step = 0;
+
+    function playPianoNote(freq, time, duration = 1.6) {
+      if (!synthGainNode || !audioCtx) return;
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const noteGain = ctx.createGain();
+
+      osc1.type = 'sine';
+      osc2.type = 'triangle';
+
+      osc1.frequency.setValueAtTime(freq, time);
+      osc2.frequency.setValueAtTime(freq * 1.001, time); // Subtle romantic chorus
+
+      noteGain.gain.setValueAtTime(0.001, time);
+      noteGain.gain.exponentialRampToValueAtTime(0.12, time + 0.04);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, time + duration);
+
+      osc1.connect(noteGain);
+      osc2.connect(noteGain);
+      noteGain.connect(synthGainNode);
+
+      osc1.start(time);
+      osc2.start(time);
+      osc1.stop(time + duration);
+      osc2.stop(time + duration);
     }
 
-    try {
-      const masterGain = audioCtx.createGain();
-      masterGain.gain.setValueAtTime(0.01, audioCtx.currentTime);
-      masterGain.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 3);
+    function tick() {
+      if (!isMusicPlaying) return;
+      const currentChord = romanticChords[chordIndex];
+      const noteFreq = currentChord[step % currentChord.length];
+      const now = ctx.currentTime;
 
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(320, audioCtx.currentTime);
+      playPianoNote(noteFreq, now, 2.0);
 
-      // Warm chord notes (Fmaj7 / Am frequencies: A3, C4, E4, G4)
-      const freqs = [220, 261.63, 329.63, 392.00];
+      // Play soft bass root on step 0
+      if (step === 0) {
+        playPianoNote(currentChord[0] / 2, now, 3.2);
+      }
 
-      synthNodes = freqs.map((freq, index) => {
-        const osc = audioCtx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-
-        // LFO for slow dreamy shimmer
-        const lfo = audioCtx.createOscillator();
-        const lfoGain = audioCtx.createGain();
-        lfo.frequency.value = 0.1 + index * 0.05;
-        lfoGain.gain.value = 1.5;
-        lfo.connect(osc.frequency);
-        lfo.start();
-
-        const oscGain = audioCtx.createGain();
-        oscGain.gain.value = 0.25;
-
-        osc.connect(oscGain);
-        oscGain.connect(filter);
-        osc.start();
-
-        return { osc, lfo };
-      });
-
-      filter.connect(masterGain);
-      masterGain.connect(audioCtx.destination);
-
-      synthNodes.masterGain = masterGain;
-      isPlayingSound = true;
-      musicToggle.style.boxShadow = '0 0 20px rgba(255, 133, 162, 0.8)';
-      musicToggle.style.borderColor = 'var(--pink-accent)';
-    } catch (e) {
-      console.log('Audio init prevented or unsupported:', e);
+      step++;
+      if (step >= 4) {
+        step = 0;
+        chordIndex = (chordIndex + 1) % romanticChords.length;
+      }
     }
+
+    tick();
+    synthInterval = setInterval(tick, 750);
   }
 
-  function stopAmbientTone() {
-    if (synthNodes.masterGain && audioCtx) {
-      synthNodes.masterGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+  function stopRomanticSynth() {
+    if (synthInterval) {
+      clearInterval(synthInterval);
+      synthInterval = null;
+    }
+    if (synthGainNode && audioCtx) {
+      synthGainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
       setTimeout(() => {
-        if (synthNodes.length) {
-          synthNodes.forEach(node => {
-            try {
-              node.osc.stop();
-              node.lfo.stop();
-            } catch (e) {}
-          });
+        if (synthGainNode) {
+          synthGainNode.disconnect();
+          synthGainNode = null;
         }
-        synthNodes = [];
-      }, 1000);
+      }, 850);
     }
-    isPlayingSound = false;
-    musicToggle.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.3)';
-    musicToggle.style.borderColor = 'rgba(255, 255, 255, 0.15)';
   }
 
-  musicToggle.addEventListener('click', () => {
-    initAudioOnUserGesture();
-    playAmbientTone();
-  });
+  function updateWidgetUI(playing, statusText) {
+    isMusicPlaying = playing;
+    if (playing) {
+      if (musicPlayerWidget) musicPlayerWidget.classList.add('playing');
+      if (musicBars) musicBars.classList.add('active');
+      if (musicIcon) musicIcon.textContent = '🎵';
+      if (musicStatus) musicStatus.textContent = statusText || 'Playing ♡';
+    } else {
+      if (musicPlayerWidget) musicPlayerWidget.classList.remove('playing');
+      if (musicBars) musicBars.classList.remove('active');
+      if (musicIcon) musicIcon.textContent = '🔇';
+      if (musicStatus) musicStatus.textContent = statusText || 'Paused';
+    }
+  }
+
+  // Play romantic music (both HTML5 Audio and Synthesizer fallback)
+  function playRomanticMusic() {
+    if (isMusicPlaying) return;
+
+    if (romanticAudio) {
+      romanticAudio.volume = 0.45;
+      const playPromise = romanticAudio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            updateWidgetUI(true, 'Playing ♡');
+          })
+          .catch(() => {
+            // If HTML5 audio is restricted/fails, start romantic synth
+            getAudioContext();
+            startRomanticSynth();
+            updateWidgetUI(true, 'Playing ♡');
+          });
+      }
+    } else {
+      getAudioContext();
+      startRomanticSynth();
+      updateWidgetUI(true, 'Playing ♡');
+    }
+  }
+
+  function pauseRomanticMusic() {
+    if (romanticAudio) {
+      try {
+        romanticAudio.pause();
+      } catch (e) {}
+    }
+    stopRomanticSynth();
+    updateWidgetUI(false, 'Paused');
+  }
+
+  function toggleRomanticMusic() {
+    if (isMusicPlaying) {
+      pauseRomanticMusic();
+    } else {
+      getAudioContext();
+      playRomanticMusic();
+    }
+  }
+
+  // Autoplay handler with graceful interaction fallback
+  function setupAutoplay() {
+    if (!romanticAudio) return;
+
+    romanticAudio.volume = 0.45;
+    const initialPlay = romanticAudio.play();
+
+    if (initialPlay !== undefined) {
+      initialPlay
+        .then(() => {
+          // Autoplay succeeded right away!
+          updateWidgetUI(true, 'Playing ♡');
+        })
+        .catch((err) => {
+          // Autoplay blocked by browser policy until first interaction
+          updateWidgetUI(false, 'Tap to play ♡');
+
+          const startAudioOnFirstTouch = () => {
+            if (!userInteracted) {
+              userInteracted = true;
+              getAudioContext();
+              playRomanticMusic();
+            }
+            // Clean up event listeners
+            window.removeEventListener('click', startAudioOnFirstTouch);
+            window.removeEventListener('touchstart', startAudioOnFirstTouch);
+            window.removeEventListener('keydown', startAudioOnFirstTouch);
+          };
+
+          window.addEventListener('click', startAudioOnFirstTouch, { passive: true });
+          window.addEventListener('touchstart', startAudioOnFirstTouch, { passive: true });
+          window.addEventListener('keydown', startAudioOnFirstTouch, { passive: true });
+        });
+    }
+  }
+
+  // Click on widget toggles music
+  if (musicPlayerWidget) {
+    musicPlayerWidget.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userInteracted = true;
+      toggleRomanticMusic();
+    });
+
+    musicPlayerWidget.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        userInteracted = true;
+        toggleRomanticMusic();
+      }
+    });
+  }
+
+  // Start autoplay immediately
+  setupAutoplay();
 });
