@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uncertain.</title>
+  <meta name="description" content="Some answers take longer than expected. A personal and emotional space.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;1,400&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Ambient Sound Toggle -->
+  <button id="music-toggle" class="music-toggle" aria-label="Toggle ambient music" title="Toggle gentle sound">
+    <span class="music-icon">🎵</span>
+  </button>
+
+  <!-- Canvas for Floating Particles and Hearts -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <main class="app-container">
+
+    <!-- PAGE 1: HOME PAGE -->
+    <section id="page-home" class="page active">
+      <div class="home-content">
+        <div class="floating-heart-badge">♡</div>
+        <h3 class="main-heading glow-text">Uncertain (My life Rn).</h3>
+        <p class="subtitle-text">Don't know why this time it took a very long giving an answer.</p>
+        <p class="tagline-text">Waiting for an answer that could change everything.</p>
+
+        <div class="action-wrap">
+          <button id="btn-start" class="btn-glow">
+            <span>Click Here</span>
+            <span class="btn-heart">♡</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 2: SECRET INPUT PAGE -->
+    <section id="page-secret" class="page">
+      <div class="glass-card secret-card">
+        <div class="heart-pulse-icon">♡</div>
+        <h2 class="card-title">Before you continue...</h2>
+        <p class="card-subtitle">There is one little thing only you would know.</p>
+
+        <form id="secret-form" class="secret-form" onsubmit="return false;">
+          <div class="input-group">
+            <input type="text" id="secret-input" placeholder="Enter the text..." autocomplete="off" autocorrect="off"
+              autocapitalize="off" spellcheck="false" aria-label="Secret phrase input">
+            <button type="submit" id="btn-secret-submit" class="btn-primary">Continue</button>
+          </div>
+          <div id="secret-error" class="error-msg" aria-live="polite"></div>
+          <p class="hint-text">Hint: <span>chinnuu</span></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- PAGE 3: FINAL PAGE -->
+    <section id="page-final" class="page">
+      <!-- Background Image Layer with Vignette & Dark Overlay -->
+      <div class="final-bg-layer" style="background-image: url('love-background.jpg');"></div>
+      <div class="final-overlay"></div>
+
+      <!-- Main Glass Container -->
+      <div class="glass-container-large">
+        <div class="glass-header">
+          <div class="glowing-heart">♡</div>
+          <p class="pre-heading">For my heartbeat.....</p>
+          <h2 class="message-title">Maybe some things are worth waiting for.</h2>
+          <div class="divider">
+            <span class="divider-line"></span>
+            <span class="divider-heart">♡</span>
+            <span class="divider-line"></span>
+          </div>
+        </div>
+
+        <div class="message-body">
+          <p class="msg-paragraph fade-in-paragraph p-1">
+            I am still not knowing what is stopping us to get into a relation...
+            Nak inka ardam kanidi enti ante we are not our prblms kani evariko 3rd person is being effected ani cheppi
+            manam relation loki not gng. I don't know mari enduko ila.
+            I am really getting hurt each and every single time, oka 2 or 3 days nundi nen kuda sarigga matladatle kani
+            nen am I talking aa no naa emi ledu still u ask for Thulasi matladatle ante nak ardam avvatle so naa talking
+            or naa presence ki no value naa??
+            Em anna ante u say they r frnds ur my love. Kani even the priority or time or amount of time u spend with
+            frnds kuda I am not getting if they are frnds I am ur love I shuld definitely have priority over every
+            others kadha kani I am not even feeling it...
+            I know I made mistake I know when I am not there Keerthi is with you that doesn't mean nen asala em cheyale
+            kadha everytime they get more prioritized over me I am not knowing how to take it, even u know I don't like
+            u being with Akhil still u be together... something I ask this way u just say nv levu aa thulasi tho nen
+            unna unnapudu nv okka roju adigi unte nen nek eche priority ento telisedi emo bujjodaaaaaaa
+          </p>
+
+          <p class="msg-paragraph fade-in-paragraph p-2">
+            I am really not knowing what am I, still aa roju manam godavapaddam not even a single msg aa roju ala react
+            ayav I know enduku react ayyavoo I can understand that inka nundi ala undan le panduuu ani atleast not even
+            a single msg or talk on it.....
+            ninna nen lunch tinale just I waited for 20min nv lunch lo bayatiki vasthav emo ani akkada steps medha
+            kurchoni.... but noo u r just having ur lunch with Akhil then what meeeeee edi chepthe u ask okapudu nv
+            thulasi alane unnar nen em anna annana ani apudu nen thappu ye kani crt cheskoni tirigi vachaka nen ala
+            cheyale kadha inka u see that old vatsav or u talk about that old vatsav mari nee kosam change aina vatsav
+            gurinchi em antav??
+          </p>
+
+          <p class="msg-paragraph fade-in-paragraph p-3">
+            I don't know nee decision yepduu chepthav kuda ante decision cheppa kadha ante Chinnuuu manam relation loki
+            veldhama odhu aa anedi Yes or No avvali anthe kani half half laga Yes No ans enti chinuuuu I know ur afraid
+            of all these kani even u know kadha that I changed, that I can care well about you, I can love you more than
+            anything anii sare kopam undachu emo nak kani nek telusu kadha aa kopam nak nee medha na or else vere
+            situations aa ani..
+            I jst don't want you to again go into the stress, get panic attacks and all nek unna kopam, nek unna hatred,
+            nek unna trust issues and all edo oka rojuki tagguthayi ga avvi kuda life long u can't carry kadha one end
+            they come to an end so when it comes an end just msg me..... always be it close or far u r the only love i
+            have and i will have till end
+            Take careeeee
+          </p>
+
+          <p class="msg-paragraph fade-in-paragraph p-4">
+            love youuuuuuuuuuuuuuuu chinnuuuuuuuuuuu
+            Cheppaga when all comes to an end just oka req pettu acc ki potato.07.22 nee okka request kosam matrame nen
+            roju aa acc open chesthaaaaa take care I'm gonna not irritate, disturb or be a toxic guy any moreee
+
+          </p>
+
+          <div class="final-quote-wrap fade-in-paragraph p-5">
+            <p class="final-quote">Some people are worth waiting for. ♡</p>
+          </div>
+
+          <div class="signature-wrap fade-in-paragraph p-6">
+            <span class="signature">— Someone who is still waiting, yoursssss Constant, your panduuu, your
+              chinnaaa</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
